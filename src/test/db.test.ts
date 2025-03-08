@@ -5,15 +5,23 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 // import * as myExtension from '../../extension';
 
+import * as yaml from 'yaml'
+
 import {
     WorkInterval,
     WorkLocation,
-} from '../backend/model'
+    WorkDay
+} from '../backend/models'
+
+import {
+    WorkDaySerializer,
+    WorkIntervalSerializer
+} from '../backend/serializers'
 
 suite('DB Test Suite', () => {
     vscode.window.showInformationMessage('Start all tests.');
 
-    test('Time interval', () => {
+    test('Time interval - model', () => {
         /* Timestamp start created automatically if not specified */
         const dut_1 = new WorkInterval(WorkLocation.Home);
         assert.strictEqual(false, dut_1.isCompleted());
@@ -51,6 +59,42 @@ suite('DB Test Suite', () => {
         const dut_5 = new WorkInterval(WorkLocation.Home, timestamp_start_5);
         assert.throws(() => dut_5.setTimestampEnd(new Date(dut_5.getTimestampStart().getTime() - 1000)));
     });
+
+    test('Time interval - serializer', () => {
+        const interval_1 = new WorkInterval(
+            WorkLocation.Home,
+            new Date((new Date()).getTime() - 1000*60*60),
+            new Date()
+        );
+        const interval_2 = new WorkInterval(
+            WorkLocation.Home,
+            new Date((new Date()).getTime() - 1000*60*60),
+            new Date()
+        );
+        const interval_3 = new WorkInterval(
+            WorkLocation.Home,
+            new Date((new Date()).getTime() - 1000*60*60),
+            new Date()
+        );
+        const workday_1 = new WorkDay();
+        workday_1.addInterval(interval_1);
+        workday_1.addInterval(interval_2);
+        workday_1.addInterval(interval_3);
+        workday_1.addText(`
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure 
+dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non 
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+`);
+        
+        const work_interval_serializer = new WorkIntervalSerializer();
+        const work_day_serializer = new WorkDaySerializer(work_interval_serializer);
+
+        console.log(work_day_serializer.serialize(workday_1));
+
+    });
+
+
 
     test('Duration ms to format', () => {
         const interval: number = 15756512

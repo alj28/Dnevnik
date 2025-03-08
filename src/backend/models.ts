@@ -96,3 +96,32 @@ Duration: ${WorkInterval.formatDuration(hours, minutes, seconds)}`;
       return `${hours}:${minutes}:${seconds}`;
     }
 };
+
+export class WorkDay {
+    private intervals: Array<WorkInterval> = [];
+    private text: string = "";
+
+    getLastInterval(): WorkInterval | undefined {
+        return this.intervals.at(-1);
+    }
+
+    getIntervals(): Array<WorkInterval> {
+        return this.intervals;
+    }
+
+    addInterval(interval: WorkInterval) {
+        this.intervals.push(interval);
+    }
+
+    getText(): string {
+        return this.text;
+    }
+
+    setText(text: string) {
+        this.text = text;
+    }
+
+    addText(text: string) {
+        this.text += text;
+    }
+}
